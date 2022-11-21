@@ -30,27 +30,28 @@ namespace ConsoleApp1
 				string buff = file.ReadLine(); //первая строка файла
 				string finish = "^"; // стопсивол
 				string litter = "*"; //разделитель
-				bool theend = true;
+				bool theend = true; // нашли стопсимвол или нет
 				List<string> expressions;
 
-				while (theend) //пока не нашли ^ и не дошли до конца
+				//создание списка нетерминалов
+				while (theend) //пока не нашли ^
 				{
 
-					while (buff[j] != litter[0] && buff[j] != finish[0]) j++; //отмеряем размер строки до *
+					while (buff[j] != litter[0] && buff[j] != finish[0]) j++; //ищем именно символы между * и стопситвол ^
 					if (buff[j] == litter[0])
 					{
 						value = buff.Substring(0, j); //копируем строку до * в отдельную переменную
 						noterminals.Add(value); //добавляет строку в лист
 						buff = buff.Remove(0, j + 1); //удаляем строку вместе с *
 						j = 0; //начинаем с начала строки
-						theend = true;
+						theend = true; //стопсимвола нет
 
 					}
 					else if (buff[j] == finish[0])
 					{
-						theend = false;
+						theend = false; //нашли стопсимвол
 					}
-					else theend = false;
+					else theend = false; //в любой непонятной ситуации выключить
 				}
 				int size_buff = buff.Length; //осталась последняя строка
 				value = buff.Substring(0, size_buff-1); //копируем последнюю строку
@@ -59,11 +60,11 @@ namespace ConsoleApp1
 				buff = file.ReadLine(); //читаем вторую строку файла
 				theend = true;
 				
-
-				while (theend) //пока не нашли ^ и не дошли до конца
+				//создание списка терминалов
+				while (theend) //пока не нашли ^
 				{
 
-					while (buff[j] != litter[0] && buff[j] != finish[0]) j++; //отмеряем размер строки до *
+					while (buff[j] != litter[0] && buff[j] != finish[0]) j++; //ищем именно символы между * и стопситвол ^
 					if (buff[j] == litter[0])
 					{
 						value = buff.Substring(0, j); //копируем строку до * в отдельную переменную
@@ -83,17 +84,18 @@ namespace ConsoleApp1
 				value = buff.Substring(0, size_buff - 1); //копируем последнюю строку
 				terminals.Add(value); //добавляем строку в лист
 
+				//создание массива правил
 				while (!file.EndOfStream)
                 {
-					buff = file.ReadLine();
+					buff = file.ReadLine(); //читаем строки
 					theend = true;
-					expressions = new List<string>();
+					expressions = new List<string>(); //создаем новую строку в массиве
 
 					while (theend) //пока не нашли ^
 					{
 
 
-						while (buff[j] != litter[0] && buff[j] != finish[0]) j++; //отмеряем размер строки до *
+						while (buff[j] != litter[0] && buff[j] != finish[0]) j++; //ищем именно символы между * и стопситвол ^
                         if(buff[j] == litter[0])
 						{
 							value = buff.Substring(0, j); //копируем строку до * в отдельную переменную
@@ -135,15 +137,15 @@ namespace ConsoleApp1
 			}
 
 			Console.WriteLine(); //строка между выводами
-			List<string> buffer = new List<string>();
-
-			for (int i = 0; i < regulations.Count; i++) // Чуть сложного кода для карсивого вывода)
+			
+			//вывод правил
+			for (int i = 0; i < regulations.Count; i++) //пока недошли до конца
 			{
-				Console.Write("    " + regulations[0][0] + " -> ");
-				for (int j = 1; j < regulations[i].Count; j++) 
+				Console.Write("    " + regulations[i][0] + " -> "); //выписываем первый эл строки
+				for (int j = 1; j < regulations[i].Count; j++) //пока недошли до конца строки
 				{
 					if (j > 1) Console.Write(", ");
-					Console.Write(regulations[i][j]);
+					Console.Write(regulations[i][j]); //выписываем эл строки
 				}
 				Console.WriteLine(" ");
 			}
