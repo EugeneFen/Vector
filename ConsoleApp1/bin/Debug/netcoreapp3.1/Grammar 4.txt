@@ -1,6 +1,6 @@
 S
 A*S*B*M*N*K^
-&*c*p*b*a^
+c*p*b*a^
 A*&^
 A*c^
 B*&^
