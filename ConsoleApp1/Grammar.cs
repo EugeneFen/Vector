@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -13,9 +13,16 @@ namespace ConsoleApp1
 		private String initial;
 		private List<string> goodSimvols = new List<string>(); //хорошие нетерминалы (алг 1)
 
-		bool termWord = false;          // Если false - то язык пуст
-		bool isProgrammEnd = false;     // Если true - то все рекурсивные вызовы завершаются
-		bool isValPrint = false;        // Если true - то ответ больше не печатается
+		private bool termWord = false;          // Если false - то язык пуст
+		private bool isProgrammEnd = false;     // Если true - то все рекурсивные вызовы завершаются
+
+		public List<string> V = new List<string>();//множество достижимых символов (алг 2)
+		List<string> V_start = new List<string>();
+		bool begin_ = true;//
+
+		public List<string> noterminals_V = new List<string>(); //нетерминалы вывода 
+		public List<string> terminals_V = new List<string>(); //терминалы вывода
+		public List<List<string>> rules_V = new List<List<string>>(); //правила вывода
 
 		private void ReadFile()
 		{
@@ -133,9 +140,8 @@ namespace ConsoleApp1
 				file.Close(); //закрываем файл
 			}
 		}
-		// Находит все терминалы в правилах (только односимвольные), и отправляет их в Finder
-		
-		public void CheckIsHaveTermOnrules()
+		// Находит все терминалы в правилах (только односимвольные), и отправляет их в Finder		
+		private void CheckIsHaveTermOnrules()
 		{
 			for (int i = 0; i < rules.Count; i++)
 			{
@@ -212,7 +218,6 @@ namespace ConsoleApp1
 				}
 			}
 		}		
-
 		// Ищет во множестве хороших смиволов начальный символ
 		private void Search_for_original_symbol()
 		{
@@ -227,7 +232,7 @@ namespace ConsoleApp1
 				}
 			}
 		}
-		public void printCanBelanguage()
+		private void printCanBelanguage()
 		{			
 			Console.WriteLine(" ");
 			Search_for_original_symbol();
@@ -275,6 +280,106 @@ namespace ConsoleApp1
 				Console.Write(this.goodSimvols[i]);
 			}
 			Console.WriteLine();
+
+			for (int i = 0; i < noterminals_V.Count; i++)
+			{
+				if (i > 0) Console.Write(", ");
+				Console.Write(noterminals_V[i]);
+			}
+			Console.WriteLine("  ;");
+			for (int i = 0; i < terminals_V.Count; i++)
+			{
+				if (i > 0) Console.Write(", ");
+				Console.Write(terminals_V[i]);
+			}
+			Console.WriteLine("  ;");
+
+			for (int i = 0; i < rules_V.Count; i++) // Чуть сложного кода для карсивого вывода)
+			{
+				Console.Write("    " + rules_V[i][0] + " -> ");
+				for (int j = 1; j < rules_V[i].Count; j++) // Проверить на ошибки при выводе 
+				{
+					if (j > 1) Console.Write(", ");
+					Console.Write(rules_V[i][j]);
+				}
+				Console.WriteLine(" ");
+			}
+		}
+		public void Algorithm_1()
+        {
+			CheckIsHaveTermOnrules();
+			printCanBelanguage();
+		}
+		public void Algorithm_2()
+		{
+			if (begin_ == true)//если только начало алгоритма, то 
+			V.Add(initial);//v_0={s}
+								//если не начало, то пропускается этот шаг
+			int i;
+			V_start = V;//это необходимо для сравнения V_i-1 = V_i, если равны, то алгоритм продолжается, а если нет - то рекурсия 
+			for (i = 0; i < rules.Count; i++)
+			{
+				for (int k = 0; k < V.Count; k++)
+				{
+					if (rules[i][0] == V[k])//аксиома правила принадлежит ли множеству достижимых символов?
+					{
+						for (int j = 0; j < rules[i].Count; j++)//добавляет множество символов, которые принадлежат правилу и аксиома которых уже добавлена в множестве достижимых символов
+						{
+							string rule = rules[i][j];//символ правила 
+							if (!V.Exists(x => x == rule))//проверяет, существует ли символ в множестве достижимых символов 
+							{
+								V.Add(rule);//если не существует, то добавляет его в  V(множ-во достиж-ых сим-лов)
+							}
+						}
+						if (V_start != V)
+						{
+							begin_ = false;
+							Algorithm_2();//рекурсия 
+						}
+						else
+						{
+							End_alg8_2();//создает то что будет на выводе
+						}
+					}
+				}
+			}
+		}
+		private void End_alg8_2()
+		{
+			noterminals_V = Together(noterminals, V);
+			terminals_V = Together(terminals, V);
+
+			for (int i = 0; i < rules.Count; i++)//проходимся по всем правилам
+			{
+				bool prov = true;
+				for (int j = 0; j < rules[i].Count; j++)
+				{
+					if (!V.Exists(x => x == rules[i][j])) //если символ правила не содержится в V, то правило не добавляется в итоговоый вывод
+					{
+						prov = false;
+					}
+				}
+				if (prov == true)
+				{
+					rules_V.Add(rules[i]);//итоговый вывод правил
+				}
+			}
+		}
+		private List<string> Together(List<string> first, List<string> second)//пересечение двух объектов 
+		{
+			List<string> itog = new List<string>();
+			for (int i = 0; i < first.Count; i++)
+			{
+				for (int j = 0; j < second.Count; j++)
+				{
+					if (first[i] == second[j])
+					{
+						string res = first[i];
+						itog.Add(res);
+					}
+				}
+			}
+			return itog;
 		}
 	}
 }
