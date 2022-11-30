@@ -242,6 +242,88 @@ namespace ConsoleApp1
 			else Console.WriteLine("Language is empty");
 			Console.WriteLine(" ");
 		}
+		private List<string> Together(List<string> first, List<string> second)//пересечение двух объектов 
+		{
+			List<string> itog = new List<string>();
+			for (int i = 0; i < first.Count; i++)
+			{
+				for (int j = 0; j < second.Count; j++)
+				{
+					if (first[i] == second[j])
+					{
+						string res = first[i];
+						itog.Add(res);
+					}
+				}
+			}
+			return itog;
+		}
+		private void End_alg8_2()
+		{
+			noterminals_V = Together(noterminals, V);
+			terminals_V = Together(terminals, V);
+
+			for (int i = 0; i < rules.Count; i++)//проходимся по всем правилам
+			{
+				bool prov = true;
+				for (int j = 0; j < rules[i].Count; j++)
+				{
+					string rule = rules[i][j];//с правила 
+					for (int t = 0; t < rule.Length; t++)
+					{
+						string w = Convert.ToString(rule[t]);
+						if (!V.Exists(x => x == w))//проверяет, существует ли символ в множестве достижимых символов 
+						{
+							prov = false;
+						}
+					}
+				}
+				if (prov == true && !rules_V.Exists(x => x == rules[i]))
+				{
+					rules_V.Add(rules[i]);//итоговый вывод правил
+				}
+			}
+		}
+		private void Selection()
+		{
+			if (begin_ == true)//если только начало алгоритма, то 
+				V.Add(initial);//v_0={s}
+							   //если не начало, то пропускается этот шаг
+			int i;
+			V_start = V;//это необходимо для сравнения V_i-1 = V_i, если равны, то алгоритм продолжается, а если нет - то рекурсия 
+			for (i = 0; i < rules.Count; i++)
+			{
+				for (int k = 0; k < V.Count; k++)
+				{
+					if (rules[i][0] == V[k])//аксиома правила принадлежит ли множеству достижимых символов?
+					{
+						for (int j = 0; j < rules[i].Count; j++)//добавляет множество символов, которые принадлежат правилу и аксиома которых уже добавлена в множестве достижимых символов
+						{
+							string rule = rules[i][j];//с правила 
+							for (int t = 0; t < rule.Length; t++)
+							{
+								string w = Convert.ToString(rule[t]);
+								if (!V.Exists(x => x == w))//проверяет, существует ли символ в множестве достижимых символов 
+								{
+									V.Add(w);//если не существует, то добавляет его в  V(множ-во достиж-ых сим-лов)
+								}
+
+							}
+
+						}
+						if (V_start != V)
+						{
+							begin_ = false;
+							Selection();//рекурсия 
+						}
+						else
+						{
+							End_alg8_2();//создает то что будет на выводе
+						}
+					}
+				}
+			}
+		}
 		public Grammar()
 		{
 			ReadFile();
@@ -307,90 +389,77 @@ namespace ConsoleApp1
 		}
 		public void Algorithm_1()
         {
+			goodSimvols.Clear();
 			CheckIsHaveTermOnrules();
 			printCanBelanguage();
 		}
 		public void Algorithm_2()
-		{
-			if (begin_ == true)//если только начало алгоритма, то 
-				V.Add(initial);//v_0={s}
-							   //если не начало, то пропускается этот шаг
-			int i;
-			V_start = V;//это необходимо для сравнения V_i-1 = V_i, если равны, то алгоритм продолжается, а если нет - то рекурсия 
-			for (i = 0; i < rules.Count; i++)
-			{
-				for (int k = 0; k < V.Count; k++)
-				{
-					if (rules[i][0] == V[k])//аксиома правила принадлежит ли множеству достижимых символов?
-					{
-						for (int j = 0; j < rules[i].Count; j++)//добавляет множество символов, которые принадлежат правилу и аксиома которых уже добавлена в множестве достижимых символов
-						{
-							string rule = rules[i][j];//с правила 
-							for (int t = 0; t < rule.Length; t++)
-							{
-								string w = Convert.ToString(rule[t]);
-								if (!V.Exists(x => x == w))//проверяет, существует ли символ в множестве достижимых символов 
-								{
-									V.Add(w);//если не существует, то добавляет его в  V(множ-во достиж-ых сим-лов)
-								}
-
-                            }
-							
-						}
-						if (V_start != V)
-						{
-							begin_ = false;
-							Algorithm_2();//рекурсия 
-						}
-						else
-						{
-							End_alg8_2();//создает то что будет на выводе
-						}
-					}
-				}
-			}
+        {
+			noterminals_V.Clear();
+			terminals_V.Clear();
+			rules_V.Clear();
+			Selection();
 		}
-		private void End_alg8_2()
-		{
-			noterminals_V = Together(noterminals, V);
-			terminals_V = Together(terminals, V);
-
-			for (int i = 0; i < rules.Count; i++)//проходимся по всем правилам
-			{
-				bool prov = true;
-				for (int j = 0; j < rules[i].Count; j++)
-				{
-					string rule = rules[i][j];//с правила 
-					for (int t = 0; t < rule.Length; t++)
-					{
-						string w = Convert.ToString(rule[t]);
-						if (!V.Exists(x => x == w))//проверяет, существует ли символ в множестве достижимых символов 
+		public void Algorithm_3()
+        {
+			Algorithm_1();
+			getGrammar();
+			List<List<string>> regulations = new List<List<string>>();
+			List<string> expressions; //каждое новое правило сначала заноситься в промежуточный лист
+			for (int i = 0; i < rules.Count; i++) //столбец правила
+            {
+				bool litter = false; //нашли терм или нетерм в правиле
+				bool found = true;
+				for (int j=0; j < rules[i].Count; j++) //строка правила
+                {
+					int size_rules = rules[i][j].Length; //размер строки правила
+					String buff = rules[i][j]; //ячейка правила			
+					int t = 0;
+					while((t < size_rules) && (found)) //ходим по строке правила
+                    {
+						int k = 0;
+						while((k<goodSimvols.Count) && (!litter)) //смотрим есть ли нетерм
+                        {
+							String buff_good = goodSimvols[k];
+							if (buff[t] == buff_good[0]) litter = true;
+							k++;	
+                        }
+						k = 0;
+						while((k<terminals.Count) && (!litter)) //смотрим есть ли терм
 						{
-							prov = false;
+							String buff_term = terminals[k];
+							if (buff[t] == buff_term[0]) litter = true;
+							k++;
 						}
-					}
+						if (litter) found = true;
+						else found = false;
+						litter = false;
+						t++;
+                    }                    
 				}
-				if (prov == true && !rules_V.Exists(x=>x==rules[i]))
-				{
-					rules_V.Add(rules[i]);//итоговый вывод правил
+				if (found)
+                {
+					expressions = new List<string>(); //создаем новую строку таблицы листов
+					for (int j = 0; j < rules[i].Count; j++) //строка правила
+                    {
+						expressions.Add(rules[i][j]);
+                    }
+					regulations.Add(expressions);
 				}
-			}
-		}
-		private List<string> Together(List<string> first, List<string> second)//пересечение двух объектов 
-		{
-			List<string> itog = new List<string>();
-			for (int i = 0; i < first.Count; i++)
+            }
+			Console.WriteLine();
+			Console.WriteLine("-------------------");
+			for (int i = 0; i < regulations.Count; i++) // Чуть сложного кода для карсивого вывода)
 			{
-				for (int j = 0; j < second.Count; j++)
+				Console.Write("    " + regulations[i][0] + " -> ");
+				for (int j = 1; j < regulations[i].Count; j++) // Проверить на ошибки при выводе 
 				{
-					if (first[i] == second[j])
-					{
-						string res = first[i];
-						itog.Add(res);
-					}
+					if (j > 1) Console.Write(", ");
+					Console.Write(regulations[i][j]);
 				}
+				Console.WriteLine(" ");
 			}
-			return itog;
+			Algorithm_2();
 		}
 	}
 }
