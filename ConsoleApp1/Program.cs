@@ -11,9 +11,10 @@ namespace ConsoleApp1
 		{
 			Grammar a = new Grammar();
 
-			a.Algorithm_2();
+			a.Algorithm_1();
 
-			a.getGrammar();
+			a.WriteGrammar();
+			//a.Algorithm_3();
 		}
 	}
 }
