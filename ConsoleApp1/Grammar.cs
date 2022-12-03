@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
+//поставить в левой части терминал
+
 namespace ConsoleApp1
 {
 	class Grammar
@@ -13,8 +15,7 @@ namespace ConsoleApp1
 		private String initial;
 		private List<string> goodSimvols = new List<string>(); //хорошие нетерминалы (алг 1)
 
-		private bool termWord = false;          // Если false - то язык пуст
-		private bool isProgrammEnd = false;     // Если true - то все рекурсивные вызовы завершаются
+		private bool termWord = false;          // Если false - то язык пуст		
 
 		public List<string> V = new List<string>();//множество достижимых символов (алг 2)
 		List<string> V_start = new List<string>();
@@ -140,37 +141,34 @@ namespace ConsoleApp1
 				file.Close(); //закрываем файл
 			}
 		}
-		// Находит все терминалы в правилах (только односимвольные), и отправляет их в Finder		
+		// Находит все терминалы в правилах (только односимвольные), и отправляет их в Finder	
+		/*
+		 * идем по всем правилам и ищем терминал вправой части. сл аходим в стрке равила терминал, то нетерм, из которог следует правило,
+		 * попадает в список хороших символов. 
+		 * после идем в Finder с тим нетермом.
+		 */
 		private void CheckIsHaveTermOnrules()
 		{
 			for (int i = 0; i < rules.Count; i++)
 			{
-				for (int j = 0; j < rules[i].Count; j++) // Смотрим по всем правилам
+				for (int j = 1; j < rules[i].Count; j++) // Смотрим по всем правилам
 				{
 					for (int k = 0; k < terminals.Count; k++) // По всем терминалам
 					{
-						int size_rules = rules[i][j].Length;
-						String buff = rules[i][j];
-						String buffer = terminals[k];
 						bool q = true;
-                        for( int t = 0; t < size_rules; t++ )
+                        for( int t = 0; t < rules[i][j].Length; t++ )
                         {
-							if (buff[t] == buffer[0] && q == true) // Сравниваем каждый элемент
+							if (rules[i][j][t] == terminals[k][0] && q)
 							{
 								q = false;
-								// Нашли, что в каком-то правиле есть терминал		
-								//Console.Write(rules[i][0] + "  -  ");	
-								int size_good = goodSimvols.Count;
-								int e = 0;
+								// Нашли, что в каком-то правиле есть терминал										
 								bool add_good = true;
-								while (e < size_good)
+								for (int e = 0; e < goodSimvols.Count; e++) if (goodSimvols[e] == rules[i][0]) add_good = false;
+								if (add_good)
 								{
-									if (goodSimvols[e] == rules[i][0]) add_good = false;
-									e++;
+									this.goodSimvols.Add(rules[i][0]);//хорошие не терминалы								 
+									Finder(rules[i][0]); // Отправляем его в Finder
 								}
-								if (add_good) this.goodSimvols.Add(rules[i][0]);//хорошие не терминалы								 
-														  //Console.WriteLine("При начальном обходе нашли терминал в правилах, это: " + rules[i][j]);
-								Finder(rules[i][0]); // Отправляем его в Finder
 							}
                         }
                        						
@@ -178,43 +176,44 @@ namespace ConsoleApp1
 				}
 			}
 		}
-		// Получает на вход лексему, и ищет существует ли правило, из которого эту лексему можно получить
+		// Получает на вход нетерм, и ищет существует ли правило, из которого эту лексему можно получить
 		// Если такое правило есть, то рекурсивно отправляет в самого себя это правило, в качестве входного значения
 		// Если это найденное правило является аксиомой - то язык не пуст
 		private void Finder(string findCell)
 		{
-			if (isProgrammEnd == false)
+			//Console.WriteLine("Ищем элемент " + findCell + " во всех правилах");
+			for (int i = 0; i < rules.Count; i++)
 			{
-				//Console.WriteLine("Ищем элемент " + findCell + " во всех правилах");
-				for (int i = 0; i < rules.Count; i++)
+				for (int j = 1; j < rules[i].Count; j++)
 				{
-					for (int j = 1; j < rules[i].Count; j++)
+					bool goo = true;
+					for (int e = 0; e < goodSimvols.Count; e++) if (rules[i][0][0] == goodSimvols[e][0]) goo = false;
+					if(goo)
 					{
-						int size_rules = rules[i][j].Length;
-						String buff = rules[i][j];						
-						bool q = true;
-						for (int t = 0; t < size_rules; t++)
-                        {
-							if (buff[t] == findCell[0] && q == true)
+						bool add_good = false;
+						for (int t = 0; t < rules[i][j].Length; t++)
+						{
+							if (rules[i][0][0] == rules[i][j][t]) break;
+							for (int k = 0; k < goodSimvols.Count; k++)
 							{
-								q = false;
-								//Console.Write("Нашли. ");
-								//Console.WriteLine("Начало правила: " + rules[i][0] + ". Теперь ищем правило, из которого этот элемент получался бы");
-								//Console.Write(rules[i][0] + "  +  ");
-								int size_good = goodSimvols.Count;
-								int k = 0;
-								bool add_good = true;
-								while (k < size_good)
+								if (goodSimvols[k][0] == rules[i][j][t]) add_good = true;
+								else
 								{
-									if (goodSimvols[k] == rules[i][0]) add_good = false;
-									k++;
+									for (int r = 0; r < terminals.Count; r++) // По всем терминалам
+									{
+										if (rules[i][j][t] == terminals[r][0]) add_good = true;
+										else add_good = false;
+									}
 								}
-								if(add_good) this.goodSimvols.Add(rules[i][0]);
-								Finder(rules[i][0]);
 							}
-                        }
-							
+						}
+						if (add_good)
+						{
+							this.goodSimvols.Add(rules[i][0]);
+							Finder(rules[i][0]);
+						}
 					}
+						
 				}
 			}
 		}		
@@ -328,7 +327,7 @@ namespace ConsoleApp1
 		{
 			ReadFile();
 		}
-		public void getGrammar()
+		public void WriteGrammar()
         {
 			for (int i = 0; i < noterminals.Count; i++)
 			{
@@ -403,7 +402,7 @@ namespace ConsoleApp1
 		public void Algorithm_3()
         {
 			Algorithm_1();
-			getGrammar();
+			WriteGrammar();
 			List<List<string>> regulations = new List<List<string>>();
 			List<string> expressions; //каждое новое правило сначала заноситься в промежуточный лист
 			for (int i = 0; i < rules.Count; i++) //столбец правила
