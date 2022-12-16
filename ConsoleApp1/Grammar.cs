@@ -151,27 +151,35 @@ namespace ConsoleApp1
 		{
 			for (int i = 0; i < rules.Count; i++)
 			{
-				for (int j = 1; j < rules[i].Count; j++) // Смотрим по всем правилам
+				for (int j = 0; j < rules[i].Count; j++) // Смотрим по всем правилам
 				{
 					for (int k = 0; k < terminals.Count; k++) // По всем терминалам
 					{
+						int size_rules = rules[i][j].Length;
+						String buff = rules[i][j];
+						String buffer = terminals[k];
 						bool q = true;
-                        for( int t = 0; t < rules[i][j].Length; t++ )
-                        {
-							if (rules[i][j][t] == terminals[k][0] && q)
+						for (int t = 0; t < size_rules; t++)
+						{
+							if (buff[t] == buffer[0] && q == true) // Сравниваем каждый элемент
 							{
 								q = false;
-								// Нашли, что в каком-то правиле есть терминал										
+								// Нашли, что в каком-то правиле есть терминал		
+								//Console.Write(rules[i][0] + "  -  ");	
+								int size_good = goodSimvols.Count;
+								int e = 0;
 								bool add_good = true;
-								for (int e = 0; e < goodSimvols.Count; e++) if (goodSimvols[e] == rules[i][0]) add_good = false;
-								if (add_good)
+								while (e < size_good)
 								{
-									this.goodSimvols.Add(rules[i][0]);//хорошие не терминалы								 
-									Finder(rules[i][0]); // Отправляем его в Finder
+									if (goodSimvols[e] == rules[i][0]) add_good = false;
+									e++;
 								}
+								if (add_good) this.goodSimvols.Add(rules[i][0]);//хорошие не терминалы								 
+																				//Console.WriteLine("При начальном обходе нашли терминал в правилах, это: " + rules[i][j]);
+								Finder(rules[i][0]); // Отправляем его в Finder
 							}
-                        }
-                       						
+						}
+
 					}
 				}
 			}
@@ -285,11 +293,12 @@ namespace ConsoleApp1
 		}
 		private void Selection()
 		{
+			List<string> V_start = new List<string>();
 			if (begin_ == true)//если только начало алгоритма, то 
 				V.Add(initial);//v_0={s}
 							   //если не начало, то пропускается этот шаг
 			int i;
-			V_start = V;//это необходимо для сравнения V_i-1 = V_i, если равны, то алгоритм продолжается, а если нет - то рекурсия 
+			V_start.InsertRange(0, V);//это необходимо для сравнения V_i-1 = V_i, если равны, то алгоритм продолжается, а если нет - то рекурсия 
 			for (i = 0; i < rules.Count; i++)
 			{
 				for (int k = 0; k < V.Count; k++)
@@ -305,23 +314,23 @@ namespace ConsoleApp1
 								if (!V.Exists(x => x == w))//проверяет, существует ли символ в множестве достижимых символов 
 								{
 									V.Add(w);//если не существует, то добавляет его в  V(множ-во достиж-ых сим-лов)
+
+									if (V != V_start)
+									{
+										begin_ = false;
+										Algorithm_2();//рекурсия 
+									}
+
 								}
 
 							}
 
 						}
-						if (V_start != V)
-						{
-							begin_ = false;
-							Selection();//рекурсия 
-						}
-						else
-						{
-							End_alg8_2();//создает то что будет на выводе
-						}
+
 					}
 				}
 			}
+			End_alg8_2();
 		}
 		public Grammar()
 		{
@@ -402,7 +411,7 @@ namespace ConsoleApp1
 		public void Algorithm_3()
         {
 			Algorithm_1();
-			WriteGrammar();
+			//WriteGrammar();
 			List<List<string>> regulations = new List<List<string>>();
 			List<string> expressions; //каждое новое правило сначала заноситься в промежуточный лист
 			for (int i = 0; i < rules.Count; i++) //столбец правила
