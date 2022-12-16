@@ -1,0 +1,11 @@
+S
+A*B*S^
+a*b^
+S*&^
+S*aAB^
+S*BA^
+A*BBB^
+A*a^
+B*AS^
+B*b^
+A*aB^
