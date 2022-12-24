@@ -1,0 +1,14 @@
+C:\Users\Computer\source\repos\MiniStringFuck\bin\Debug\netcoreapp3.1\MiniStringFuck.exe
+C:\Users\Computer\source\repos\MiniStringFuck\bin\Debug\netcoreapp3.1\MiniStringFuck.deps.json
+C:\Users\Computer\source\repos\MiniStringFuck\bin\Debug\netcoreapp3.1\MiniStringFuck.runtimeconfig.json
+C:\Users\Computer\source\repos\MiniStringFuck\bin\Debug\netcoreapp3.1\MiniStringFuck.runtimeconfig.dev.json
+C:\Users\Computer\source\repos\MiniStringFuck\bin\Debug\netcoreapp3.1\MiniStringFuck.dll
+C:\Users\Computer\source\repos\MiniStringFuck\bin\Debug\netcoreapp3.1\MiniStringFuck.pdb
+C:\Users\Computer\source\repos\MiniStringFuck\obj\Debug\netcoreapp3.1\MiniStringFuck.csproj.AssemblyReference.cache
+C:\Users\Computer\source\repos\MiniStringFuck\obj\Debug\netcoreapp3.1\MiniStringFuck.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Computer\source\repos\MiniStringFuck\obj\Debug\netcoreapp3.1\MiniStringFuck.AssemblyInfoInputs.cache
+C:\Users\Computer\source\repos\MiniStringFuck\obj\Debug\netcoreapp3.1\MiniStringFuck.AssemblyInfo.cs
+C:\Users\Computer\source\repos\MiniStringFuck\obj\Debug\netcoreapp3.1\MiniStringFuck.csproj.CoreCompileInputs.cache
+C:\Users\Computer\source\repos\MiniStringFuck\obj\Debug\netcoreapp3.1\MiniStringFuck.dll
+C:\Users\Computer\source\repos\MiniStringFuck\obj\Debug\netcoreapp3.1\MiniStringFuck.pdb
+C:\Users\Computer\source\repos\MiniStringFuck\obj\Debug\netcoreapp3.1\MiniStringFuck.genruntimeconfig.cache
